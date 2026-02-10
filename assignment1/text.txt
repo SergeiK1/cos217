@@ -1,0 +1,13 @@
+abc/*def*/ghi
+abc/*def*/ ghi
+abc /*def*/ghi
+abc//def
+abc/*def
+ghi*/jkl
+mno
+abc/*defo
+ghi
+jkl*/mno
+pqr
+abc/*def/*ghi*/jkl*/mno
+
