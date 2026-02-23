@@ -1,0 +1,38 @@
+CODE (accept)  [ -- Start State -- ]
+   /:       SAW_SLASH
+   ":       STRING
+   ':       CHAR
+   other:   CODE
+
+SAW_SLASH (accept)
+   *:       COMMENT
+   /:       SAW_SLASH
+   ":       STRING
+   ':       CHAR
+   other:   CODE
+
+COMMENT (reject)
+   *:       COMMENT_STAR
+   other:   COMMENT
+
+COMMENT_STAR (reject)
+   /:       CODE
+   *:       COMMENT_STAR
+   other:   COMMENT
+
+STRING (accept)
+   \:       STRING_ESC
+   ":       CODE
+   other:   STRING
+
+STRING_ESC (accept)
+   other:   STRING
+
+CHAR (accept)
+   \:       CHAR_ESC
+   ':       CODE
+   other:   CHAR
+
+CHAR_ESC (accept)
+   other:   CHAR
+
