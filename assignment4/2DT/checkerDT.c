@@ -24,8 +24,8 @@ boolean CheckerDT_Node_isValid(Node_T oNNode) {
       return FALSE;
    }
 
-   /* Sample check: parent's path must be the longest possible
-      proper prefix of the node's path */
+   /* parent's path must be the longest possible
+      proper prefix of the node's path and checks that parent is one less depth to the child and checks to see if a NULL parent node is at depth 1 */
    oNParent = Node_getParent(oNNode);
    if(oNParent != NULL) {
       oPNPath = Node_getPath(oNNode);
@@ -37,7 +37,19 @@ boolean CheckerDT_Node_isValid(Node_T oNNode) {
                  Path_getPathname(oPPPath), Path_getPathname(oPNPath));
          return FALSE;
       }
-   }
+
+      if ((Path_getDepth(oPPPath)+1) != Path_getDepth(oPNPath)) {
+          fprintf(stderr, "Parent depth is not one less than child depth\n");
+          return FALSE;
+      }
+
+      
+   } else if (Path_getDepth(Node_getPath(oNNode))!= 1){
+           fprintf(stderr, "Node has no parent but NOT at depth 1\n");
+           return FALSE;
+
+   } 
+
 
    return TRUE;
 }
@@ -71,6 +83,22 @@ static boolean CheckerDT_treeCheck(Node_T oNNode) {
             fprintf(stderr, "getNumChildren claims more children than getChild returns\n");
             return FALSE;
          }
+
+         if (Node_getParent(oNChild) != oNNode){
+             fprintf(stderr, "child does not link back to parent\n");
+             return FALSE;
+         }
+         /* Checks if the children are in lexicographic order for binary search */
+         if (ulIndex > 0) {
+            Node_T oNPrevChild = NULL;
+            Node_getChild(oNNode, ulIndex-1, &oNPrevChild);
+            if (Node_compare(oNPrevChild, oNChild) >= 0) {
+                fprintf(stderr, "Children are not in lexicographic order\n");
+                return FALSE;
+        }
+    }
+
+
 
          /* if recurring down one subtree results in a failed check
             farther down, passes the failure back up immediately */
