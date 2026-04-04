@@ -63,11 +63,11 @@ boolean CheckerDT_Node_isValid(Node_T oNNode) {
    parameter list to facilitate constructing your checks.
    If you do, you should update this function comment.
 */
-static boolean CheckerDT_treeCheck(Node_T oNNode, size_t ulCount, size_t nodeCount) {
+static boolean CheckerDT_treeCheck(Node_T oNNode, size_t *pulCount) {
    size_t ulIndex;
 
    if(oNNode!= NULL) {
-       nodeCount++;
+       (*pulCount)++;
 
       /* Sample check on each node: node must be valid */
       /* If not, pass that failure back up immediately */
@@ -100,17 +100,10 @@ static boolean CheckerDT_treeCheck(Node_T oNNode, size_t ulCount, size_t nodeCou
         }
     }
 
-         /* Checks to make sure ulCount is updated correctly */
-         if(nodeCount != ulCount) {
-             fprintf(stderr, "the total count of nodes does not match the actual number of nodes");
-             return FALSE;
-         }
-
-
 
          /* if recurring down one subtree results in a failed check
             farther down, passes the failure back up immediately */
-         if(!CheckerDT_treeCheck(oNChild, ulCount, nodeCount))
+         if(!CheckerDT_treeCheck(oNChild, pulCount))
             return FALSE;
       }
    }
@@ -121,6 +114,7 @@ static boolean CheckerDT_treeCheck(Node_T oNNode, size_t ulCount, size_t nodeCou
 boolean CheckerDT_isValid(boolean bIsInitialized, Node_T oNRoot,
                           size_t ulCount) {
 
+    size_t nodeCount = 0;
    /* Sample check on a top-level data structure invariant:
       if the DT is not initialized, its count should be 0. */
    if(!bIsInitialized)
@@ -130,5 +124,15 @@ boolean CheckerDT_isValid(boolean bIsInitialized, Node_T oNRoot,
       }
 
    /* Now checks invariants recursively at each node from the root. */
-   return CheckerDT_treeCheck(oNRoot, ulCount, 0);
+   /*return CheckerDT_treeCheck(oNRoot, size_t *pulCount);*/
+   if(!CheckerDT_treeCheck(oNRoot, &nodeCount)){
+    return FALSE;
+   }
+
+   /* Check to make sure node count matches the ulCount */
+    if(nodeCount != ulCount) {
+        fprintf(stderr, "ulCount does not match actual node count\n");
+        return FALSE;
+    }
+    return TRUE;
 }
