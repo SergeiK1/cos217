@@ -132,12 +132,14 @@ int main(void) {
      assert(!strcmp(...)) line in the code below:
      fprintf(stderr, "Checkpoint Promotion:\n%s\n", temp);
   */
+  fprintf(stderr, "Checkpoint Promotion:\n%s\n", temp);
   assert(DT_insert("a/y") == SUCCESS);
   assert((temp = DT_toString()) != NULL);
   assert(!strcmp(temp,"a\na/y\n"));
   free(temp);
   assert(DT_insert("a/x") == SUCCESS);
   assert((temp = DT_toString()) != NULL);
+  fprintf(stderr, "\n\nTEMP: %s\n\n", temp);
   assert(!strcmp(temp,"a\na/x\na/y\n"));
   free(temp);
   assert(DT_rm("a/y") == SUCCESS);
