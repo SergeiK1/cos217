@@ -160,6 +160,12 @@ the error manifests itself or is "noticed" by the client.
 What are your critiques of the given DT implementations, as
 specified in Step 2.5?
 
+- Node_toString exists but never called in dtGood.c or client, should be removed or if necessary made static 
+
+- DT_preOrderTraversal takes in parameters in the order of n, d, i while setting htem in DynArray_set with the order of d, i, n which is inconsistent and should be modified (d = dynamic array, i = index, n = node)
+
+
+- DT_toString has no check on if nodes != null since the DynArray_new can return null, if thats the case then it will pass to later function a null value which is not great
 
 
 ------------------------------------------------------------------------
