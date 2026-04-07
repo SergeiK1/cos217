@@ -7,8 +7,7 @@
 #include <assert.h>
 #include <string.h>
 #include "dynarray.h"
-#include "nodeDT.h"
-#include "checkerDT.h"
+#include "nodeFT.h"
 
 /* A node in a DT */
 struct node {
@@ -16,8 +15,14 @@ struct node {
    Path_T oPPath;
    /* this node's parent */
    Node_T oNParent;
-   /* the object containing links to this node's children */
+   /* the object containing links to this node's directory children 
+    * | NULL if isFile is true */
    DynArray_T oDChildren;
+   /* the object containing links to the node's file children
+    * | NULL if isFile is true */
+   DynArray_T oFChildren;
+   /* void poiter to file contents | null if isFile is false */
+   void * pContents;
 };
 
 
@@ -72,7 +77,7 @@ int Node_new(Path_T oPPath, Node_T oNParent, Node_T *poNResult) {
    int iStatus;
 
    assert(oPPath != NULL);
-   assert(oNParent == NULL || CheckerDT_Node_isValid(oNParent));
+   assert(oNParent == NULL);
 
    /* allocate space for a new node */
    psNew = malloc(sizeof(struct node));
@@ -156,8 +161,7 @@ int Node_new(Path_T oPPath, Node_T oNParent, Node_T *poNResult) {
 
    *poNResult = psNew;
 
-   assert(oNParent == NULL || CheckerDT_Node_isValid(oNParent));
-   assert(CheckerDT_Node_isValid(*poNResult));
+   assert(oNParent == NULL);
 
    return SUCCESS;
 }
@@ -167,7 +171,6 @@ size_t Node_free(Node_T oNNode) {
    size_t ulCount = 0;
 
    assert(oNNode != NULL);
-   assert(CheckerDT_Node_isValid(oNNode));
 
    /* remove from parent's list */
    if(oNNode->oNParent != NULL) {

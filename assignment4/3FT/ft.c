@@ -11,9 +11,8 @@
 
 #include "dynarray.h"
 #include "path.h"
-#include "nodeDT.h"
-#include "checkerDT.h"
-#include "dt.h"
+#include "nodeFT.h"
+#include "ft.h"
 
 
 /*
@@ -175,7 +174,6 @@ int DT_insert(const char *pcPath) {
    size_t ulNewNodes = 0;
 
    assert(pcPath != NULL);
-   assert(CheckerDT_isValid(bIsInitialized, oNRoot, ulCount));
 
    /* validate pcPath and generate a Path_T for it */
    if(!bIsInitialized)
@@ -225,7 +223,6 @@ int DT_insert(const char *pcPath) {
          Path_free(oPPath);
          if(oNFirstNew != NULL)
             (void) Node_free(oNFirstNew);
-         assert(CheckerDT_isValid(bIsInitialized, oNRoot, ulCount));
          return iStatus;
       }
 
@@ -236,7 +233,6 @@ int DT_insert(const char *pcPath) {
          Path_free(oPPrefix);
          if(oNFirstNew != NULL)
             (void) Node_free(oNFirstNew);
-         assert(CheckerDT_isValid(bIsInitialized, oNRoot, ulCount));
          return iStatus;
       }
 
@@ -255,7 +251,6 @@ int DT_insert(const char *pcPath) {
       oNRoot = oNFirstNew;
    ulCount += ulNewNodes;
 
-   assert(CheckerDT_isValid(bIsInitialized, oNRoot, ulCount));
    return SUCCESS;
 }
 
@@ -275,7 +270,6 @@ int DT_rm(const char *pcPath) {
    Node_T oNFound = NULL;
 
    assert(pcPath != NULL);
-   assert(CheckerDT_isValid(bIsInitialized, oNRoot, ulCount));
 
    iStatus = DT_findNode(pcPath, &oNFound);
 
@@ -286,12 +280,10 @@ int DT_rm(const char *pcPath) {
    if(ulCount == 0)
       oNRoot = NULL;
 
-   assert(CheckerDT_isValid(bIsInitialized, oNRoot, ulCount));
    return SUCCESS;
 }
 
 int DT_init(void) {
-   assert(CheckerDT_isValid(bIsInitialized, oNRoot, ulCount));
 
    if(bIsInitialized)
       return INITIALIZATION_ERROR;
@@ -300,12 +292,10 @@ int DT_init(void) {
    oNRoot = NULL;
    ulCount = 0;
 
-   assert(CheckerDT_isValid(bIsInitialized, oNRoot, ulCount));
    return SUCCESS;
 }
 
 int DT_destroy(void) {
-   assert(CheckerDT_isValid(bIsInitialized, oNRoot, ulCount));
 
    if(!bIsInitialized)
       return INITIALIZATION_ERROR;
@@ -317,7 +307,6 @@ int DT_destroy(void) {
 
    bIsInitialized = FALSE;
 
-   assert(CheckerDT_isValid(bIsInitialized, oNRoot, ulCount));
    return SUCCESS;
 }
 

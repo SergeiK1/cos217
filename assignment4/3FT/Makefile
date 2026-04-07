@@ -7,7 +7,10 @@
 
 CC=gcc217
 
-all: sampleft
+
+TARGETS = ft sampleft
+
+all: $(TARGETS)
 
 clean:
 	rm -f sampleft
@@ -20,3 +23,19 @@ sampleft: sampleft.o ft_client.o
 
 ft_client.o: ft_client.c ft.h a4def.h
 	$(CC) -c ft_client.c
+
+ft: ft.o nodeFT.o path.o dynarray.o ft_client.o
+	$(CC) ft.o nodeFT.o path.o dynarray.o ft_client.o -o ft
+
+ft.o: ft.c ft.h
+	$(CC) -c ft.c
+
+nodeFT.o: nodeFT.c nodeFT.h
+	$(CC) -c nodeFT.c
+
+dynarray.o: dynarray.c dynarray.h
+	$(CC) -c dynarray.c
+	
+path.o: path.c dynarray.h path.h a4def.h
+	$(CC) -c path.c
+
