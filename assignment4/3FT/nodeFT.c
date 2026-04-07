@@ -23,6 +23,8 @@ struct node {
    DynArray_T oFChildren;
    /* void poiter to file contents | null if isFile is false */
    void * pContents;
+   /* a boolean flag to indicate whether node is director or file */
+   boolean isFile;
 };
 
 
@@ -32,11 +34,20 @@ struct node {
   or  MEMORY_ERROR if allocation fails adding oNChild to the array.
 */
 static int Node_addChild(Node_T oNParent, Node_T oNChild,
-                         size_t ulIndex) {
+                         size_t ulIndex, boolean isFile) {
    assert(oNParent != NULL);
    assert(oNChild != NULL);
 
-   if(DynArray_addAt(oNParent->oDChildren, ulIndex, oNChild))
+   // if node is a directory
+   if (!isFile) {
+      if(DynArray_addAt(oNParent->oDChildren, ulIndex, oNChild))
+         return SUCCESS;
+      else
+         return MEMORY_ERROR;
+   }
+   
+   // if node is a file
+   if(DynArray_addAt(oNParent->oFChildren, ulIndex, oNChild))
       return SUCCESS;
    else
       return MEMORY_ERROR;
