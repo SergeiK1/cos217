@@ -180,7 +180,6 @@ static int FT_findNode(const char *pcPath, Node_T *poNResult) {
 }
 /*--------------------------------------------------------------------*/
 
-/* Inserts directiory at pcPath */
 int FT_insertDir(const char *pcPath) {
    int iStatus;
    Path_T oPPath = NULL;
@@ -325,7 +324,6 @@ int FT_rmDir(const char *pcPath) {
    return SUCCESS;
 }
 
-/* Inserts file at pcPath with pvContents and ulLength */
 int FT_insertFile(const char *pcPath, void *pvContents,
                   size_t ulLength) {
    int iStatus;
@@ -439,7 +437,7 @@ int FT_insertFile(const char *pcPath, void *pvContents,
    if (iStatus != SUCCESS) {
       Path_free(oPPath);
       if (oNFirstNew != NULL) {
-         Node_free(oNFirstNew);
+         (void) Node_free(oNFirstNew);
       }
       return iStatus;
    }

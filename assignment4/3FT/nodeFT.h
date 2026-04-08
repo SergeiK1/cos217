@@ -108,7 +108,7 @@ void *Node_getContents(Node_T oNNode);
 size_t Node_getContentLength(Node_T oNNode);
 
 /* Sets the content of oNNode with pvContents and sets its length
-   as ulLength */
+   as ulLength. */
 void Node_setContents(Node_T oNNode, void *pvContents,
                       size_t ulLength);
 

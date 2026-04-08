@@ -118,7 +118,7 @@ your disagreements with them? Copy the splint warnings here, and
 express your disagreement after each warning. If there are no
 warnings, then write "None."
 
-
+None.
 
 ------------------------------------------------------------------------
 What warnings does critTer generate on checkerDT.c, and what are your
@@ -126,7 +126,22 @@ disagreements with them? Copy the critTer warnings here, and express
 your disagreement after each warning. If there are no warnings, then
 write "None."
 
+checkerDT.c: line 66: medium priority:
+Do you want to validate 'pulCount' through an assert?
 
+Not validating is fine because pulCount is only passed internally from
+CheckerDT_isValid. It is initialized as a valid address &nodeCount and
+only passes it to its private helper CheckerDT_treeCheck, which is not
+part of the external API. Extra assert is not necessary.
+
+checkerDT.c: line 97: low priority:
+This area is deeply nested at level 4, consider refactoring
+
+This nesting is acceptable because its logic is tied to one specific
+invariant check of validating child ordering only after confirming
+the child exists and not at the first index. Splitting this check
+into modularized helper functions could instead reduce readability
+more than improve it.
 
 ------------------------------------------------------------------------
 What warnings does splint generate on your Part 3 code, and what are
@@ -169,13 +184,24 @@ the error manifests itself or is "noticed" by the client.
 What are your critiques of the given DT implementations, as
 specified in Step 2.5?
 
-- Node_toString exists but never called in dtGood.c or client, should be removed or if necessary made static 
+- Node_toString exists but never called in dtGood.c or client, should be
+removed or if necessary made static 
 
-- DT_preOrderTraversal takes in parameters in the order of n, d, i while setting htem in DynArray_set with the order of d, i, n which is inconsistent and should be modified (d = dynamic array, i = index, n = node)
+- DT_preOrderTraversal takes in parameters in the order of n, d, i while
+setting htem in DynArray_set with the order of d, i, n which is
+inconsistent and should be modified
+(d = dynamic array, i = index, n = node)
 
-- DT_toString has no check on if nodes != null since the DynArray_new can return null, if thats the case then it will pass to later function a null value which is not great
+- DT_toString has no check on if nodes != null since the DynArray_new
+can return null, if thats the case then it will pass to later function
+a null value which is not great
 
-  DT_insert calls Path_free(oPPrefix) when both iStatus is successful and unsuccessful upon calling Node_new(). Currently, it is called twice: one within the if statement that checks (iStatus != SUCCESS) and another after the if statement in the case that iStatus is successful. This can condensed by calling Path_free(oPPrefix) right after Node_new() but before the if statement that checks iStatus.
+- DT_insert calls Path_free(oPPrefix) when both iStatus is successful
+  and unsuccessful upon calling Node_new(). Currently, it is called
+  twice: one within the if statement that checks (iStatus != SUCCESS)
+  and another after the if statement in the case that iStatus is
+  successful. This can condensed by calling Path_free(oPPrefix) right
+  after Node_new() but before the if statement that checks iStatus.
 
 
 ------------------------------------------------------------------------

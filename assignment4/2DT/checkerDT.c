@@ -12,7 +12,13 @@
 
 
 
-/* see checkerDT.h for specification */
+/* 
+   See checkerDT.h for further specification. 
+   Checks whether node oNNode satisfies all invariants by verifying
+   that the node is non-NULL, that its parent-child path relationship
+   is structurally correct, and that root nodes are the only nodes
+   allowed to have no parent.
+*/
 boolean CheckerDT_Node_isValid(Node_T oNNode) {
    Node_T oNParent;
    Path_T oPNPath;
@@ -25,7 +31,9 @@ boolean CheckerDT_Node_isValid(Node_T oNNode) {
    }
 
    /* parent's path must be the longest possible
-      proper prefix of the node's path and checks that parent is one less depth to the child and checks to see if a NULL parent node is at depth 1 */
+      proper prefix of the node's path and checks that parent is one
+      less depth to the child and checks to see if a NULL parent node
+      is at depth 1 */
    oNParent = Node_getParent(oNNode);
    if(oNParent != NULL) {
       oPNPath = Node_getPath(oNNode);
@@ -59,9 +67,12 @@ boolean CheckerDT_Node_isValid(Node_T oNNode) {
    Returns FALSE if a broken invariant is found and
    returns TRUE otherwise.
 
-   You may want to change this function's return type or
-   parameter list to facilitate constructing your checks.
-   If you do, you should update this function comment.
+   For every reachable node, this function:
+   * incrememnts *pulCount
+   * checks that the node itself is valid
+   * checks that each child can be retrieved successfully
+   * checks that each child points to oNNode as its parent
+   * checks that children are stored in increasing lexographic order
 */
 static boolean CheckerDT_treeCheck(Node_T oNNode, size_t *pulCount) {
    size_t ulIndex;
@@ -81,7 +92,8 @@ static boolean CheckerDT_treeCheck(Node_T oNNode, size_t *pulCount) {
          int iStatus = Node_getChild(oNNode, ulIndex, &oNChild);
 
          if(iStatus != SUCCESS) {
-            fprintf(stderr, "getNumChildren claims more children than getChild returns\n");
+            fprintf(stderr,
+               "getNumChildren claims more children than getChild\n");
             return FALSE;
          }
 
@@ -89,13 +101,15 @@ static boolean CheckerDT_treeCheck(Node_T oNNode, size_t *pulCount) {
              fprintf(stderr, "child does not link back to parent\n");
              return FALSE;
          }
-         /* Checks if the children are in lexicographic order for binary search */
+         /* Checks if the children are in lexicographic order for binary
+            search */
          if (ulIndex > 0) {
             Node_T oNPrevChild = NULL;
             Node_getChild(oNNode, ulIndex-1, &oNPrevChild);
             if (Path_comparePath(Node_getPath(oNPrevChild), 
                      Node_getPath(oNChild)) >= 0) {
-                fprintf(stderr, "Children are not in lexicographic order\n");
+                fprintf(stderr,
+                        "Children are not in lexicographic order\n");
                 return FALSE;
         }
     }
@@ -110,11 +124,20 @@ static boolean CheckerDT_treeCheck(Node_T oNNode, size_t *pulCount) {
    return TRUE;
 }
 
-/* see checkerDT.h for specification */
+/* 
+   See checkerDT.h for specification.
+   Checks whether the entire DT satisfies global invariants by
+   verifying initialization/count consistency via boolean
+   bIsInitialized, recursively validating reachable nodes in the
+   tree starting at root node oNRoot, checking each child links back
+   to its parent, checking children remain in lexicographic order, and
+   ensuring the total number of reachable nodes matches ulCount.
+*/
 boolean CheckerDT_isValid(boolean bIsInitialized, Node_T oNRoot,
                           size_t ulCount) {
 
     size_t nodeCount = 0;
+
    /* Sample check on a top-level data structure invariant:
       if the DT is not initialized, its count should be 0. */
    if(!bIsInitialized)
