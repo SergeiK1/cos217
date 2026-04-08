@@ -226,6 +226,7 @@ int FT_insertDir(const char *pcPath) {
          return ALREADY_IN_TREE;
       }
 
+      /* if node oNCurr is a file, return NOT_A_DIRECTORY */
       if (Node_isFile(oNCurr)) {
          Path_free(oPPath);
          return NOT_A_DIRECTORY;
@@ -235,11 +236,13 @@ int FT_insertDir(const char *pcPath) {
           Path_T oPNextPrefix = NULL;
           iStatus = Path_prefix(oPPath, ulIndex, &oPNextPrefix);
           if (iStatus == SUCCESS) {
+              /* If node has a child file */
               if (Node_hasChild(oNCurr, oPNextPrefix, &ulFileID, TRUE)) {
                   Path_free(oPNextPrefix);
                   Path_free(oPPath);
                   return NOT_A_DIRECTORY;
               }
+              /* If node does not have a child file */
               Path_free(oPNextPrefix);
           }
       }
@@ -252,6 +255,7 @@ int FT_insertDir(const char *pcPath) {
 
       /* generate a Path_T for this level */
       iStatus = Path_prefix(oPPath, ulIndex, &oPPrefix);
+      /* If Path_prefix fails */
       if(iStatus != SUCCESS) {
          Path_free(oPPath);
          if(oNFirstNew != NULL)
@@ -262,6 +266,7 @@ int FT_insertDir(const char *pcPath) {
       /* insert the new node for this level */
       iStatus = Node_new(oPPrefix, oNCurr, FALSE, NULL, 0,
                          &oNNewNode);
+      /* If Node_new fails */                   
       if(iStatus != SUCCESS) {
          Path_free(oPPath);
          Path_free(oPPrefix);
@@ -273,6 +278,7 @@ int FT_insertDir(const char *pcPath) {
       /* set up for next level */
       Path_free(oPPrefix);
       oNCurr = oNNewNode;
+      /* increment ulNewNodes as a node is inserted */
       ulNewNodes++;
       if(oNFirstNew == NULL)
          oNFirstNew = oNCurr;
@@ -341,6 +347,7 @@ int FT_insertFile(const char *pcPath, void *pvContents,
       return INITIALIZATION_ERROR;
 
    iStatus = Path_new(pcPath, &oPPath);
+   /* if fails to create new path */
    if(iStatus != SUCCESS)
       return iStatus;
 
@@ -378,6 +385,8 @@ int FT_insertFile(const char *pcPath, void *pvContents,
          return ALREADY_IN_TREE;
       }
 
+      /* if node is a file when not at end of path,
+         return NOT_A_DIRECTORY */
       if (Node_isFile(oNCurr)) {
          Path_free(oPPath);
          return NOT_A_DIRECTORY;
@@ -387,6 +396,7 @@ int FT_insertFile(const char *pcPath, void *pvContents,
          Path_T oPNextPrefix = NULL;
          iStatus = Path_prefix(oPPath, ulIndex, &oPNextPrefix);
          if(iStatus == SUCCESS) {
+            /* If node has a file child while not at end of path */
             if(Node_hasChild(oNCurr, oPNextPrefix, &ulFileID, TRUE)) {
                Path_free(oPNextPrefix);
                Path_free(oPPath);
@@ -403,6 +413,7 @@ int FT_insertFile(const char *pcPath, void *pvContents,
 
       /* generate a Path_T for this level */
       iStatus = Path_prefix(oPPath, ulIndex, &oPPrefix);
+      /* if fails to generate */
       if(iStatus != SUCCESS) {
          Path_free(oPPath);
          if(oNFirstNew != NULL)
@@ -425,6 +436,7 @@ int FT_insertFile(const char *pcPath, void *pvContents,
       /* set up for next level */
       Path_free(oPPrefix);
       oNCurr = oNNewNode;
+      /* increment ulNewNodes for every new node */
       ulNewNodes++;
       if(oNFirstNew == NULL)
          oNFirstNew = oNCurr;
@@ -446,9 +458,11 @@ int FT_insertFile(const char *pcPath, void *pvContents,
    /* update FT state variables to reflect insertion */
    if(oNRoot == NULL) {
       if (oNFirstNew != NULL) {
+         /* set root to oNFirstNew */
          oNRoot = oNFirstNew;
       }
       else {
+         /* set root to parent of oNNewNode */
          oNRoot = Node_getParent(oNNewNode);
       }
    }

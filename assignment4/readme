@@ -149,7 +149,7 @@ your disagreements with them? Copy the splint warnings here, and
 express your disagreement after each warning. If there are no
 warnings, then write "None."
 
-
+None other than warnings that result from repurposing of the DT code.
 
 ------------------------------------------------------------------------
 What warnings does critTer generate on your Part 3 code, and what are
@@ -157,7 +157,11 @@ your disagreements with them? Copy the critTer warnings here, and
 express your disagreement after each warning. If there are no
 warnings, then write "None."
 
+ft.c: line 330: medium priority:
+Do you want to validate 'pvContents' through an assert?
 
+ft.c: line 590: medium priority:
+Do you want to validate 'pvNewContents' through an assert?
 
 ------------------------------------------------------------------------
 For each of the five faulty BDT implementations required by Step
