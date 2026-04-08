@@ -1,6 +1,6 @@
 /*--------------------------------------------------------------------*/
-/* nodeDT.c                                                           */
-/* Author: Christopher Moretti                                        */
+/* nodeFT.c                                                           */
+/* Author: Sergei and Josh                                       */
 /*--------------------------------------------------------------------*/
 
 #include <stdlib.h>
@@ -9,7 +9,7 @@
 #include "dynarray.h"
 #include "nodeFT.h"
 
-/* A node in a DT */
+/* A node in a FT */
 struct node {
    /* the object corresponding to the node's absolute path */
    Path_T oPPath;
