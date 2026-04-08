@@ -164,8 +164,9 @@ specified in Step 2.5?
 
 - DT_preOrderTraversal takes in parameters in the order of n, d, i while setting htem in DynArray_set with the order of d, i, n which is inconsistent and should be modified (d = dynamic array, i = index, n = node)
 
-
 - DT_toString has no check on if nodes != null since the DynArray_new can return null, if thats the case then it will pass to later function a null value which is not great
+
+  DT_insert calls Path_free(oPPrefix) when both iStatus is successful and unsuccessful upon calling Node_new(). Currently, it is called twice: one within the if statement that checks (iStatus != SUCCESS) and another after the if statement in the case that iStatus is successful. This can condensed by calling Path_free(oPPrefix) right after Node_new() but before the if statement that checks iStatus.
 
 
 ------------------------------------------------------------------------
