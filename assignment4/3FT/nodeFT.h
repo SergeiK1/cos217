@@ -104,7 +104,7 @@ boolean Node_isFile(Node_T oNNode);
 /* Returns the void pointer to the contents of the File oNNode */
 void *Node_getContents(Node_T oNNode);
 
-/* Retrurns the size_t length of the oNNode file content */
+/* Returns the size_t length of the oNNode file content */
 size_t Node_getContentLength(Node_T oNNode);
 
 /* Sets the content of oNNode with pvContents and sets its length

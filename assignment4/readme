@@ -126,7 +126,7 @@ disagreements with them? Copy the critTer warnings here, and express
 your disagreement after each warning. If there are no warnings, then
 write "None."
 
-checkerDT.c: line 66: medium priority:
+checkerDT.c: line 77: medium priority:
 Do you want to validate 'pulCount' through an assert?
 
 Not validating is fine because pulCount is only passed internally from
@@ -134,7 +134,7 @@ CheckerDT_isValid. It is initialized as a valid address &nodeCount and
 only passes it to its private helper CheckerDT_treeCheck, which is not
 part of the external API. Extra assert is not necessary.
 
-checkerDT.c: line 97: low priority:
+checkerDT.c: line 110: low priority:
 This area is deeply nested at level 4, consider refactoring
 
 This nesting is acceptable because its logic is tied to one specific
@@ -157,11 +157,32 @@ your disagreements with them? Copy the critTer warnings here, and
 express your disagreement after each warning. If there are no
 warnings, then write "None."
 
-ft.c: line 330: medium priority:
+ft.c: line 334: medium priority:
 Do you want to validate 'pvContents' through an assert?
 
-ft.c: line 590: medium priority:
+pvContents can be NULL when inserting an empty file.
+
+ft.c: line 602: medium priority:
 Do you want to validate 'pvNewContents' through an assert?
+
+pvNewContents can be NULL when replacing with empty data.
+
+nodeFT.c: line 88: medium priority:
+Do you want to validate 'pContents' through an assert?
+
+pContents can be NULL when creating a new node for either an empty file
+or for a directory.
+
+nodeFT.c: line 88: medium priority:
+Do you want to validate 'poNResult' through an assert?
+
+pONResult is an output parameter that is conrtolled internally via a
+valid address so adding an assert is not necessary.
+
+nodeFT.c: line 375: medium priority:
+Do you want to validate 'pvContents' through an assert?
+
+pvContents can be NULL when setting empty contents for a file node.
 
 ------------------------------------------------------------------------
 For each of the five faulty BDT implementations required by Step
