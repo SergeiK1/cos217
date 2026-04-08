@@ -31,16 +31,18 @@ struct node {
 
 
 /*
-  Links new child oNChild into oNParent's children array at index
+  Links new child file or directiory based on isFile oNChild into
+  oNParent's children array at index
   ulIndex. Returns SUCCESS if the new child was added successfully,
   or  MEMORY_ERROR if allocation fails adding oNChild to the array.
+
 */
 static int Node_addChild(Node_T oNParent, Node_T oNChild,
                          size_t ulIndex, boolean isFile) {
    assert(oNParent != NULL);
    assert(oNChild != NULL);
 
-   // if node is a directory
+   /*  if node is a directory */
    if (!isFile) {
       if(DynArray_addAt(oNParent->oDChildren, ulIndex, oNChild))
          return SUCCESS;
@@ -48,7 +50,7 @@ static int Node_addChild(Node_T oNParent, Node_T oNChild,
          return MEMORY_ERROR;
    }
 
-   // if node is a file
+   /* if node is a file */
    if(DynArray_addAt(oNParent->oFChildren, ulIndex, oNChild))
       return SUCCESS;
    else
@@ -119,7 +121,7 @@ int Node_new(Path_T oPPath, Node_T oNParent, boolean isFile,
         Path_free(psNew->oPPath);
         free(psNew);
         *poNResult = NULL;
-       return PARENT_IS_FILE;
+       return NOT_A_DIRECTORY;
     }
 
       oPParentPath = oNParent->oPPath;
@@ -258,8 +260,6 @@ size_t Node_free(Node_T oNNode) {
             (void) DynArray_removeAt(oNNode->oNParent->oFChildren,
                                     ulIndex);
       }
-      /* free file contents */
-      free(oNNode->pContents);
    }
 
    /* free the rest of the struct */
@@ -281,7 +281,7 @@ boolean Node_hasChild(Node_T oNParent, Path_T oPPath,
    assert(oPPath != NULL);
    assert(pulChildID != NULL);
 
-   // child node is a directory
+   /* child node is a directory */
    if (!isFile) {
       /* *pulChildID is the index into oNParent->oDChildren */
       return DynArray_bsearch(oNParent->oDChildren,
@@ -289,7 +289,7 @@ boolean Node_hasChild(Node_T oNParent, Path_T oPPath,
                (int (*)(const void*,const void*)) Node_compareString);
    }
 
-   // child node is a file
+   /* child node is a file */
    /* *pulChildID is the index into oNParent->oDChildren */
    return DynArray_bsearch(oNParent->oFChildren,
             (char*) Path_getPathname(oPPath), pulChildID,
@@ -370,4 +370,9 @@ void *Node_getContents(Node_T oNNode) {
 size_t Node_getContentLength(Node_T oNNode) {
    assert(oNNode != NULL);
    return oNNode->ulLength;
+}
+void Node_setContents(Node_T oNNode, void *pvContents, size_t ulLength) {
+   assert(oNNode != NULL);
+   oNNode->pContents = pvContents;
+   oNNode->ulLength = ulLength;
 }

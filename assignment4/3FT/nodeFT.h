@@ -48,7 +48,7 @@ Path_T Node_getPath(Node_T oNNode);
   identifier (as used in Node_getChild). If oNParent does not have
   such a child, stores in *pulChildID the identifier that such a
   child _would_ have if inserted.
-  Will return FALSE  if its a file
+  Will return FALSE if isFile is true
 */
 boolean Node_hasChild(Node_T oNParent, Path_T oPPath,
                          size_t *pulChildID, boolean isFile);
@@ -62,12 +62,16 @@ size_t Node_getNumFileChildren(Node_T oNParent);
   Returns an int SUCCESS status and sets *poNResult to be the child directory
   node of oNParent with identifier ulChildID, if one exists.
   Otherwise, sets *poNResult to NULL and returns status:
-  * NO_SUCH_PATH if ulChildID is not a valid child for oNParent
-*/
+  * NO_SUCH_PATH if ulChildID is not a valid child for oNParent */
 int Node_getDirChild(Node_T oNParent, size_t ulChildID,
                   Node_T *poNResult);
 
 /* Same just for files since indexing different array */
+/*
+  Returns an int SUCCESS status and sets *poNResult to be the child file
+  node of oNParent with identifier ulChildID, if one exists.
+  Otherwise, sets *poNResult to NULL and returns status:
+  * NO_SUCH_PATH if ulChildID is not a valid child for oNParent */
 int Node_getFileChild(Node_T oNParent, size_t ulChildID,
                   Node_T *poNResult);
 
@@ -96,10 +100,13 @@ char *Node_toString(Node_T oNNode);
 /* returns TRUE if oNNode is a file FALSE otherwise */
 boolean Node_isFile(Node_T oNNode);
 
-/*Returns the pointer to the contents of the File oNNode */
+/* Returns the void pointer to the contents of the File oNNode */
 void *Node_getContents(Node_T oNNode);
 
-/* Retrurns the length of the oNNode file content */
+/* Retrurns the size_t length of the oNNode file content */
 size_t Node_getContentLength(Node_T oNNode);
+
+/* Sets the content of oNNode with pvContents and sets its length as ulLength */
+void Node_setContents(Node_T oNNode, void *pvContents, size_t ulLength);
 
 #endif
