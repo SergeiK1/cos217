@@ -25,6 +25,8 @@ struct node {
    void * pContents;
    /* a boolean flag to indicate whether node is director or file */
    boolean isFile;
+   /* Length of the pContetnts in a file */
+   size_t ulLength;
 };
 
 
@@ -80,8 +82,8 @@ static int Node_compareString(const Node_T oNFirst,
   * PARENT_IS_FILE if parent oNParent is a file
   * ALREADY_IN_TREE if oNParent already has a child with this path
 */
-int Node_new(Path_T oPPath, Node_T oNParent, Node_T *poNResult,
-             boolean isFile) {
+int Node_new(Path_T oPPath, Node_T oNParent, boolean isFile, 
+        void *pContents, size_t ulLength, Node_T *poNResult) {
    struct node *psNew;
    Path_T oPParentPath = NULL;
    Path_T oPNewPath = NULL;
@@ -90,12 +92,7 @@ int Node_new(Path_T oPPath, Node_T oNParent, Node_T *poNResult,
    int iStatus;
 
    assert(oPPath != NULL);
-   assert(oNParent == NULL);
 
-   /* check parent is not a file */
-   if (oNParent->isFile) {
-      return PARENT_IS_FILE;
-   }
 
    /* allocate space for a new node */
    psNew = malloc(sizeof(struct node));
@@ -116,6 +113,14 @@ int Node_new(Path_T oPPath, Node_T oNParent, Node_T *poNResult,
    /* validate and set the new node's parent */
    if(oNParent != NULL) {
       size_t ulSharedDepth;
+      
+    /* check parent is not a file */
+    if (oNParent->isFile) {
+        Path_free(psNew->oPPath);
+        free(psNew);
+        *poNResult = NULL;
+       return PARENT_IS_FILE;
+    }
 
       oPParentPath = oNParent->oPPath;
       ulParentDepth = Path_getDepth(oPParentPath);
@@ -138,7 +143,7 @@ int Node_new(Path_T oPPath, Node_T oNParent, Node_T *poNResult,
       }
 
       /* parent must not already have child with this path */
-      if(Node_hasChild(oNParent, oPPath, &ulIndex)) {
+      if(Node_hasChild(oNParent, oPPath, &ulIndex, isFile)) {
          Path_free(psNew->oPPath);
          free(psNew);
          *poNResult = NULL;
@@ -156,14 +161,31 @@ int Node_new(Path_T oPPath, Node_T oNParent, Node_T *poNResult,
       }
    }
    psNew->oNParent = oNParent;
+   psNew->isFile = isFile;
+   psNew->pContents = pContents;
+   psNew->ulLength = ulLength;
 
    /* initialize the new node */
-   psNew->oDChildren = DynArray_new(0);
-   if(psNew->oDChildren == NULL) {
-      Path_free(psNew->oPPath);
-      free(psNew);
-      *poNResult = NULL;
-      return MEMORY_ERROR;
+   if(!isFile) {
+       psNew->oDChildren = DynArray_new(0);
+       if(psNew->oDChildren == NULL) {
+          Path_free(psNew->oPPath);
+          free(psNew);
+          *poNResult = NULL;
+          return MEMORY_ERROR;
+       }
+       psNew->oFChildren = DynArray_new(0);
+       if(psNew->oFChildren == NULL) {
+            DynArray_free(psNew->oDChildren);
+            Path_free(psNew->oPPath);
+            free(psNew);
+            *poNResult = NULL;
+            return MEMORY_ERROR;
+       }
+   } else {
+       psNew->oDChildren = NULL;
+       psNew->oFChildren = NULL;
+
    }
 
    /* if child is a directory */
@@ -192,19 +214,17 @@ int Node_new(Path_T oPPath, Node_T oNParent, Node_T *poNResult,
 
    *poNResult = psNew;
 
-   assert(oNParent == NULL);
-
    return SUCCESS;
 }
 
-size_t Node_free(Node_T oNNode, boolean isFile) {
+size_t Node_free(Node_T oNNode) {
    size_t ulIndex;
    size_t ulCount = 0;
 
    assert(oNNode != NULL);
 
-   /* remove directory child from parent's list */
-   if(!isFile) {
+   if(!oNNode->isFile) {
+      /* remove from parent's dir list */
       if(oNNode->oNParent != NULL) {
          if(DynArray_bsearch(
                oNNode->oNParent->oDChildren,
@@ -215,14 +235,20 @@ size_t Node_free(Node_T oNNode, boolean isFile) {
                                     ulIndex);
       }
 
-      /* recursively remove children */
+      /* recursively free file children first */
+      while(DynArray_getLength(oNNode->oFChildren) != 0) {
+         ulCount += Node_free(DynArray_get(oNNode->oFChildren, 0));
+      }
+      DynArray_free(oNNode->oFChildren);
+
+      /* recursively free dir children */
       while(DynArray_getLength(oNNode->oDChildren) != 0) {
-         ulCount += Node_free(DynArray_get(oNNode->oDChildren, 0), isFile);
+         ulCount += Node_free(DynArray_get(oNNode->oDChildren, 0));
       }
       DynArray_free(oNNode->oDChildren);
-   } 
-   /* remove file child from parent's list */
+   }
    else {
+      /* remove from parent's file list */
       if(oNNode->oNParent != NULL) {
          if(DynArray_bsearch(
                oNNode->oNParent->oFChildren,
@@ -232,18 +258,12 @@ size_t Node_free(Node_T oNNode, boolean isFile) {
             (void) DynArray_removeAt(oNNode->oNParent->oFChildren,
                                     ulIndex);
       }
-
-      /* recursively remove children */
-      while(DynArray_getLength(oNNode->oFChildren) != 0) {
-         ulCount += Node_free(DynArray_get(oNNode->oDChildren, 0), isFile);
-      }
-      DynArray_free(oNNode->oFChildren);
+      /* free file contents */
+      free(oNNode->pContents);
    }
 
-   /* remove path */
+   /* free the rest of the struct */
    Path_free(oNNode->oPPath);
-
-   /* finally, free the struct node */
    free(oNNode);
    ulCount++;
    return ulCount;
@@ -276,43 +296,40 @@ boolean Node_hasChild(Node_T oNParent, Path_T oPPath,
             (int (*)(const void*,const void*)) Node_compareString);
 }
 
-size_t Node_getNumChildren(Node_T oNParent) {
+size_t Node_getNumDirChildren(Node_T oNParent) {
    assert(oNParent != NULL);
-
-   return DynArray_getLength(oNParent->oDChildren)
-            + DynArray_getLength(oNParent->oFChildren);
+   return DynArray_getLength(oNParent->oDChildren);
 }
 
-int  Node_getChild(Node_T oNParent, size_t ulChildID,
-                   Node_T *poNResult, boolean isFile) {
+size_t Node_getNumFileChildren(Node_T oNParent) {
+   assert(oNParent != NULL);
+   return DynArray_getLength(oNParent->oFChildren);
+}
 
+int Node_getDirChild(Node_T oNParent, size_t ulChildID,
+                     Node_T *poNResult) {
    assert(oNParent != NULL);
    assert(poNResult != NULL);
 
-   /* if child is a directory */
-   if (!isFile) {
-      /* ulChildID is the index into oNParent->oDChildren */
-      if(ulChildID >= Node_getNumChildren(oNParent)) {
-         *poNResult = NULL;
-         return NO_SUCH_PATH;
-      }
-      else {
-         *poNResult = DynArray_get(oNParent->oDChildren, ulChildID);
-         return SUCCESS;
-      }
+   if(ulChildID >= Node_getNumDirChildren(oNParent)) {
+      *poNResult = NULL;
+      return NO_SUCH_PATH;
    }
-   /* if child is a file */
-   else {
-      /* ulChildID is the index into oNParent->oDChildren */
-      if(ulChildID >= Node_getNumChildren(oNParent)) {
-         *poNResult = NULL;
-         return NO_SUCH_PATH;
-      }
-      else {
-         *poNResult = DynArray_get(oNParent->oFChildren, ulChildID);
-         return SUCCESS;
-      }
+   *poNResult = DynArray_get(oNParent->oDChildren, ulChildID);
+   return SUCCESS;
+}
+
+int Node_getFileChild(Node_T oNParent, size_t ulChildID,
+                      Node_T *poNResult) {
+   assert(oNParent != NULL);
+   assert(poNResult != NULL);
+
+   if(ulChildID >= Node_getNumFileChildren(oNParent)) {
+      *poNResult = NULL;
+      return NO_SUCH_PATH;
    }
+   *poNResult = DynArray_get(oNParent->oFChildren, ulChildID);
+   return SUCCESS;
 }
 
 Node_T Node_getParent(Node_T oNNode) {
@@ -338,4 +355,19 @@ char *Node_toString(Node_T oNNode) {
       return NULL;
    else
       return strcpy(copyPath, Path_getPathname(Node_getPath(oNNode)));
+}
+
+boolean Node_isFile(Node_T oNNode) {
+   assert(oNNode != NULL);
+   return oNNode->isFile;
+}
+
+void *Node_getContents(Node_T oNNode) {
+   assert(oNNode != NULL);
+   return oNNode->pContents;
+}
+
+size_t Node_getContentLength(Node_T oNNode) {
+   assert(oNNode != NULL);
+   return oNNode->ulLength;
 }
