@@ -2,7 +2,7 @@
 # Makefile for Assignment 4, Part 3 sample implementation
 # Invoke with the command:
 # 	make -f Makefile.sampleft
-# Author: Christopher Moretti
+# Author: Sergei Kudriavtcev, Joshua (Kimyung) Song
 #--------------------------------------------------------------------
 
 CC=gcc217
@@ -35,7 +35,7 @@ nodeFT.o: nodeFT.c nodeFT.h
 
 dynarray.o: dynarray.c dynarray.h
 	$(CC) -c dynarray.c
-	
+
 path.o: path.c dynarray.h path.h a4def.h
 	$(CC) -c path.c
 
