@@ -1,6 +1,6 @@
 /*--------------------------------------------------------------------*/
-/* nodeDT.h                                                           */
-/* Author: Christopher Moretti                                        */
+/* nodeFT.h                                                           */
+/* Author: Sergei Kudriavtcev, Joshua (Kimyung) Song                  */
 /*--------------------------------------------------------------------*/
 
 #ifndef NODE_INCLUDED
@@ -16,9 +16,9 @@ typedef struct node *Node_T;
 
 /*
   Creates a new node in the File Tree, with path oPPath and
-  parent oNParent and if isFile is true it inputs the *pContents of length
-  ulLength into that file node. Returns an int SUCCESS status and sets
- *poNResult
+  parent oNParent and if isFile is true it inputs the *pContents of
+  length ulLength into that node. Returns an int SUCCESS status and
+  sets *poNResult
   to be the new node if successful. Otherwise, sets *poNResult to NULL
   and returns status:
   * MEMORY_ERROR if memory could not be allocated to complete request
@@ -28,7 +28,8 @@ typedef struct node *Node_T;
                  or oNParent is NULL but oPPath is not of depth 1
   * ALREADY_IN_TREE if oNParent already has a child with this path
 */
-int Node_new(Path_T oPPath, Node_T oNParent, boolean isFile, void *pContents, size_t ulLength, Node_T *poNResult);
+int Node_new(Path_T oPPath, Node_T oNParent, boolean isFile,
+             void *pContents, size_t ulLength, Node_T *poNResult);
 
 /*
   Destroys and frees all memory allocated for the subtree rooted at
@@ -55,21 +56,21 @@ boolean Node_hasChild(Node_T oNParent, Path_T oPPath,
 
 /* Returns the number of children directories that oNParent has. */
 size_t Node_getNumDirChildren(Node_T oNParent);
+
 /* Returns the number of children files that oNParent has. */
 size_t Node_getNumFileChildren(Node_T oNParent);
 
 /*
-  Returns an int SUCCESS status and sets *poNResult to be the child directory
-  node of oNParent with identifier ulChildID, if one exists.
+  Returns an int SUCCESS status and sets *poNResult to be the child
+  directory node of oNParent with identifier ulChildID, if one exists.
   Otherwise, sets *poNResult to NULL and returns status:
   * NO_SUCH_PATH if ulChildID is not a valid child for oNParent */
 int Node_getDirChild(Node_T oNParent, size_t ulChildID,
                   Node_T *poNResult);
 
-/* Same just for files since indexing different array */
-/*
-  Returns an int SUCCESS status and sets *poNResult to be the child file
-  node of oNParent with identifier ulChildID, if one exists.
+/* Same just for files since indexing different array.
+  Returns an int SUCCESS status and sets *poNResult to be the child
+  file node of oNParent with identifier ulChildID, if one exists.
   Otherwise, sets *poNResult to NULL and returns status:
   * NO_SUCH_PATH if ulChildID is not a valid child for oNParent */
 int Node_getFileChild(Node_T oNParent, size_t ulChildID,
@@ -106,7 +107,9 @@ void *Node_getContents(Node_T oNNode);
 /* Retrurns the size_t length of the oNNode file content */
 size_t Node_getContentLength(Node_T oNNode);
 
-/* Sets the content of oNNode with pvContents and sets its length as ulLength */
-void Node_setContents(Node_T oNNode, void *pvContents, size_t ulLength);
+/* Sets the content of oNNode with pvContents and sets its length
+   as ulLength */
+void Node_setContents(Node_T oNNode, void *pvContents,
+                      size_t ulLength);
 
 #endif

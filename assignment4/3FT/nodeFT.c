@@ -1,6 +1,6 @@
 /*--------------------------------------------------------------------*/
 /* nodeFT.c                                                           */
-/* Author: Sergei and Josh                                       */
+/* Author: Sergei Kudriavtcev, Joshua (Kimyung) Song                  */
 /*--------------------------------------------------------------------*/
 
 #include <stdlib.h>
@@ -34,8 +34,8 @@ struct node {
   Links new child file or directiory based on isFile oNChild into
   oNParent's children array at index
   ulIndex. Returns SUCCESS if the new child was added successfully,
-  or  MEMORY_ERROR if allocation fails adding oNChild to the array.
-
+  or  
+  * MEMORY_ERROR if allocation fails adding oNChild to the array.
 */
 static int Node_addChild(Node_T oNParent, Node_T oNChild,
                          size_t ulIndex, boolean isFile) {
@@ -371,6 +371,7 @@ size_t Node_getContentLength(Node_T oNNode) {
    assert(oNNode != NULL);
    return oNNode->ulLength;
 }
+
 void Node_setContents(Node_T oNNode, void *pvContents, size_t ulLength) {
    assert(oNNode != NULL);
    oNNode->pContents = pvContents;

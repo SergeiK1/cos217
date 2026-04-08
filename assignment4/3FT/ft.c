@@ -1,6 +1,6 @@
 /*--------------------------------------------------------------------*/
 /* ft.c                                                               */
-/* Author: Josh and Sergei                                        */
+/* Author: Sergei Kudriavtcev, Joshua (Kimyung) Song                  */
 /*--------------------------------------------------------------------*/
 
 #include <stddef.h>
@@ -495,34 +495,6 @@ int FT_rmFile(const char *pcPath) {
    return SUCCESS;
 }
 
-int FT_init(void) {
-
-   if(bIsInitialized)
-      return INITIALIZATION_ERROR;
-
-   bIsInitialized = TRUE;
-   oNRoot = NULL;
-   ulCount = 0;
-
-   return SUCCESS;
-}
-
-int FT_destroy(void) {
-
-   if(!bIsInitialized)
-      return INITIALIZATION_ERROR;
-
-   if(oNRoot) {
-      ulCount -= Node_free(oNRoot);
-      oNRoot = NULL;
-   }
-
-   bIsInitialized = FALSE;
-
-   return SUCCESS;
-}
-
-
 /* --------------------------------------------------------------------
 
   The following auxiliary functions are used for generating the
@@ -596,36 +568,6 @@ static void FT_strcatAccumulate(Node_T oNNode, char *pcAcc) {
 }
 /*--------------------------------------------------------------------*/
 
-char *FT_toString(void) {
-   DynArray_T nodes;
-   size_t totalStrlen = 1;
-   char *result = NULL;
-
-   if(!bIsInitialized)
-      return NULL;
-
-   nodes = DynArray_new(ulCount);
-   (void) FT_preOrderTraversal(oNRoot, nodes, 0);
-
-   DynArray_map(nodes, (void (*)(void *, void*)) FT_strlenAccumulate,
-                (void*) &totalStrlen);
-
-   result = malloc(totalStrlen);
-   if(result == NULL) {
-      DynArray_free(nodes);
-      return NULL;
-   }
-   *result = '\0';
-
-   DynArray_map(nodes, (void (*)(void *, void*)) FT_strcatAccumulate,
-                (void *) result);
-
-   DynArray_free(nodes);
-
-   return result;
-}
-
-
 void *FT_getFileContents(const char *pcPath) {
     Node_T oNFound = NULL;
     int iStatus;
@@ -691,5 +633,58 @@ int FT_stat(const char *pcPath, boolean *pbIsFile, size_t *pulSize) {
     return SUCCESS;
 }
 
+int FT_init(void) {
 
+   if(bIsInitialized)
+      return INITIALIZATION_ERROR;
 
+   bIsInitialized = TRUE;
+   oNRoot = NULL;
+   ulCount = 0;
+
+   return SUCCESS;
+}
+
+int FT_destroy(void) {
+
+   if(!bIsInitialized)
+      return INITIALIZATION_ERROR;
+
+   if(oNRoot) {
+      ulCount -= Node_free(oNRoot);
+      oNRoot = NULL;
+   }
+
+   bIsInitialized = FALSE;
+
+   return SUCCESS;
+}
+
+char *FT_toString(void) {
+   DynArray_T nodes;
+   size_t totalStrlen = 1;
+   char *result = NULL;
+
+   if(!bIsInitialized)
+      return NULL;
+
+   nodes = DynArray_new(ulCount);
+   (void) FT_preOrderTraversal(oNRoot, nodes, 0);
+
+   DynArray_map(nodes, (void (*)(void *, void*)) FT_strlenAccumulate,
+                (void*) &totalStrlen);
+
+   result = malloc(totalStrlen);
+   if(result == NULL) {
+      DynArray_free(nodes);
+      return NULL;
+   }
+   *result = '\0';
+
+   DynArray_map(nodes, (void (*)(void *, void*)) FT_strcatAccumulate,
+                (void *) result);
+
+   DynArray_free(nodes);
+
+   return result;
+}
