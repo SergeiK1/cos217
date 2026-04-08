@@ -237,7 +237,8 @@ int FT_insertDir(const char *pcPath) {
           iStatus = Path_prefix(oPPath, ulIndex, &oPNextPrefix);
           if (iStatus == SUCCESS) {
               /* If node has a child file */
-              if (Node_hasChild(oNCurr, oPNextPrefix, &ulFileID, TRUE)) {
+              if (Node_hasChild(oNCurr, oPNextPrefix, &ulFileID,
+               TRUE)) {
                   Path_free(oPNextPrefix);
                   Path_free(oPPath);
                   return NOT_A_DIRECTORY;

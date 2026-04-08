@@ -372,7 +372,8 @@ size_t Node_getContentLength(Node_T oNNode) {
    return oNNode->ulLength;
 }
 
-void Node_setContents(Node_T oNNode, void *pvContents, size_t ulLength) {
+void Node_setContents(Node_T oNNode, void *pvContents,
+   size_t ulLength) {
    assert(oNNode != NULL);
    oNNode->pContents = pvContents;
    oNNode->ulLength = ulLength;
