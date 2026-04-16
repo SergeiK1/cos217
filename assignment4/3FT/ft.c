@@ -1,6 +1,6 @@
 /*--------------------------------------------------------------------*/
 /* ft.c                                                               */
-/* Author: Josh and Sergei                                        */
+/* Author: Sergei Kudriavtcev, Joshua (Kimyung) Song                  */
 /*--------------------------------------------------------------------*/
 
 #include <stddef.h>
@@ -120,7 +120,7 @@ static int FT_traversePath(Path_T oPPath, Node_T *poNFurthest) {
   Traverses the FT to find a node with absolute path pcPath. Returns a
   int SUCCESS status and sets *poNResult to be the node, if found.
   Otherwise, sets *poNResult to NULL and returns with status:
-  * INITIALIZATION_ERROR if the DT is not in an initialized state
+  * INITIALIZATION_ERROR if the FT is not in an initialized state
   * BAD_PATH if pcPath does not represent a well-formatted path
   * CONFLICTING_PATH if the root's path is not a prefix of pcPath
   * NO_SUCH_PATH if no node with pcPath exists in the hierarchy
@@ -180,7 +180,6 @@ static int FT_findNode(const char *pcPath, Node_T *poNResult) {
 }
 /*--------------------------------------------------------------------*/
 
-/* Inserts directiory at pcPath */
 int FT_insertDir(const char *pcPath) {
    int iStatus;
    Path_T oPPath = NULL;
@@ -227,6 +226,7 @@ int FT_insertDir(const char *pcPath) {
          return ALREADY_IN_TREE;
       }
 
+      /* if node oNCurr is a file, return NOT_A_DIRECTORY */
       if (Node_isFile(oNCurr)) {
          Path_free(oPPath);
          return NOT_A_DIRECTORY;
@@ -236,11 +236,14 @@ int FT_insertDir(const char *pcPath) {
           Path_T oPNextPrefix = NULL;
           iStatus = Path_prefix(oPPath, ulIndex, &oPNextPrefix);
           if (iStatus == SUCCESS) {
-              if (Node_hasChild(oNCurr, oPNextPrefix, &ulFileID, TRUE)) {
+              /* If node has a child file */
+              if (Node_hasChild(oNCurr, oPNextPrefix, &ulFileID,
+               TRUE)) {
                   Path_free(oPNextPrefix);
                   Path_free(oPPath);
                   return NOT_A_DIRECTORY;
               }
+              /* If node does not have a child file */
               Path_free(oPNextPrefix);
           }
       }
@@ -253,6 +256,7 @@ int FT_insertDir(const char *pcPath) {
 
       /* generate a Path_T for this level */
       iStatus = Path_prefix(oPPath, ulIndex, &oPPrefix);
+      /* If Path_prefix fails */
       if(iStatus != SUCCESS) {
          Path_free(oPPath);
          if(oNFirstNew != NULL)
@@ -263,6 +267,7 @@ int FT_insertDir(const char *pcPath) {
       /* insert the new node for this level */
       iStatus = Node_new(oPPrefix, oNCurr, FALSE, NULL, 0,
                          &oNNewNode);
+      /* If Node_new fails */                   
       if(iStatus != SUCCESS) {
          Path_free(oPPath);
          Path_free(oPPrefix);
@@ -274,6 +279,7 @@ int FT_insertDir(const char *pcPath) {
       /* set up for next level */
       Path_free(oPPrefix);
       oNCurr = oNNewNode;
+      /* increment ulNewNodes as a node is inserted */
       ulNewNodes++;
       if(oNFirstNew == NULL)
          oNFirstNew = oNCurr;
@@ -281,7 +287,7 @@ int FT_insertDir(const char *pcPath) {
    }
 
    Path_free(oPPath);
-   /* update DT state variables to reflect insertion */
+   /* update FT state variables to reflect insertion */
    if(oNRoot == NULL)
       oNRoot = oNFirstNew;
    ulCount += ulNewNodes;
@@ -325,7 +331,6 @@ int FT_rmDir(const char *pcPath) {
    return SUCCESS;
 }
 
-/* Inserts file at pcPath with pvContents and ulLength */
 int FT_insertFile(const char *pcPath, void *pvContents,
                   size_t ulLength) {
    int iStatus;
@@ -343,6 +348,7 @@ int FT_insertFile(const char *pcPath, void *pvContents,
       return INITIALIZATION_ERROR;
 
    iStatus = Path_new(pcPath, &oPPath);
+   /* if fails to create new path */
    if(iStatus != SUCCESS)
       return iStatus;
 
@@ -380,6 +386,8 @@ int FT_insertFile(const char *pcPath, void *pvContents,
          return ALREADY_IN_TREE;
       }
 
+      /* if node is a file when not at end of path,
+         return NOT_A_DIRECTORY */
       if (Node_isFile(oNCurr)) {
          Path_free(oPPath);
          return NOT_A_DIRECTORY;
@@ -389,6 +397,7 @@ int FT_insertFile(const char *pcPath, void *pvContents,
          Path_T oPNextPrefix = NULL;
          iStatus = Path_prefix(oPPath, ulIndex, &oPNextPrefix);
          if(iStatus == SUCCESS) {
+            /* If node has a file child while not at end of path */
             if(Node_hasChild(oNCurr, oPNextPrefix, &ulFileID, TRUE)) {
                Path_free(oPNextPrefix);
                Path_free(oPPath);
@@ -405,6 +414,7 @@ int FT_insertFile(const char *pcPath, void *pvContents,
 
       /* generate a Path_T for this level */
       iStatus = Path_prefix(oPPath, ulIndex, &oPPrefix);
+      /* if fails to generate */
       if(iStatus != SUCCESS) {
          Path_free(oPPath);
          if(oNFirstNew != NULL)
@@ -427,6 +437,7 @@ int FT_insertFile(const char *pcPath, void *pvContents,
       /* set up for next level */
       Path_free(oPPrefix);
       oNCurr = oNNewNode;
+      /* increment ulNewNodes for every new node */
       ulNewNodes++;
       if(oNFirstNew == NULL)
          oNFirstNew = oNCurr;
@@ -439,7 +450,7 @@ int FT_insertFile(const char *pcPath, void *pvContents,
    if (iStatus != SUCCESS) {
       Path_free(oPPath);
       if (oNFirstNew != NULL) {
-         Node_free(oNFirstNew);
+         (void) Node_free(oNFirstNew);
       }
       return iStatus;
    }
@@ -448,9 +459,11 @@ int FT_insertFile(const char *pcPath, void *pvContents,
    /* update FT state variables to reflect insertion */
    if(oNRoot == NULL) {
       if (oNFirstNew != NULL) {
+         /* set root to oNFirstNew */
          oNRoot = oNFirstNew;
       }
       else {
+         /* set root to parent of oNNewNode */
          oNRoot = Node_getParent(oNNewNode);
       }
    }
@@ -494,34 +507,6 @@ int FT_rmFile(const char *pcPath) {
 
    return SUCCESS;
 }
-
-int FT_init(void) {
-
-   if(bIsInitialized)
-      return INITIALIZATION_ERROR;
-
-   bIsInitialized = TRUE;
-   oNRoot = NULL;
-   ulCount = 0;
-
-   return SUCCESS;
-}
-
-int FT_destroy(void) {
-
-   if(!bIsInitialized)
-      return INITIALIZATION_ERROR;
-
-   if(oNRoot) {
-      ulCount -= Node_free(oNRoot);
-      oNRoot = NULL;
-   }
-
-   bIsInitialized = FALSE;
-
-   return SUCCESS;
-}
-
 
 /* --------------------------------------------------------------------
 
@@ -596,36 +581,6 @@ static void FT_strcatAccumulate(Node_T oNNode, char *pcAcc) {
 }
 /*--------------------------------------------------------------------*/
 
-char *FT_toString(void) {
-   DynArray_T nodes;
-   size_t totalStrlen = 1;
-   char *result = NULL;
-
-   if(!bIsInitialized)
-      return NULL;
-
-   nodes = DynArray_new(ulCount);
-   (void) FT_preOrderTraversal(oNRoot, nodes, 0);
-
-   DynArray_map(nodes, (void (*)(void *, void*)) FT_strlenAccumulate,
-                (void*) &totalStrlen);
-
-   result = malloc(totalStrlen);
-   if(result == NULL) {
-      DynArray_free(nodes);
-      return NULL;
-   }
-   *result = '\0';
-
-   DynArray_map(nodes, (void (*)(void *, void*)) FT_strcatAccumulate,
-                (void *) result);
-
-   DynArray_free(nodes);
-
-   return result;
-}
-
-
 void *FT_getFileContents(const char *pcPath) {
     Node_T oNFound = NULL;
     int iStatus;
@@ -691,5 +646,58 @@ int FT_stat(const char *pcPath, boolean *pbIsFile, size_t *pulSize) {
     return SUCCESS;
 }
 
+int FT_init(void) {
 
+   if(bIsInitialized)
+      return INITIALIZATION_ERROR;
 
+   bIsInitialized = TRUE;
+   oNRoot = NULL;
+   ulCount = 0;
+
+   return SUCCESS;
+}
+
+int FT_destroy(void) {
+
+   if(!bIsInitialized)
+      return INITIALIZATION_ERROR;
+
+   if(oNRoot) {
+      ulCount -= Node_free(oNRoot);
+      oNRoot = NULL;
+   }
+
+   bIsInitialized = FALSE;
+
+   return SUCCESS;
+}
+
+char *FT_toString(void) {
+   DynArray_T nodes;
+   size_t totalStrlen = 1;
+   char *result = NULL;
+
+   if(!bIsInitialized)
+      return NULL;
+
+   nodes = DynArray_new(ulCount);
+   (void) FT_preOrderTraversal(oNRoot, nodes, 0);
+
+   DynArray_map(nodes, (void (*)(void *, void*)) FT_strlenAccumulate,
+                (void*) &totalStrlen);
+
+   result = malloc(totalStrlen);
+   if(result == NULL) {
+      DynArray_free(nodes);
+      return NULL;
+   }
+   *result = '\0';
+
+   DynArray_map(nodes, (void (*)(void *, void*)) FT_strcatAccumulate,
+                (void *) result);
+
+   DynArray_free(nodes);
+
+   return result;
+}
