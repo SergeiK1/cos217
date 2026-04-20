@@ -3,12 +3,12 @@ Assignment 5 readme File
 ------------------------------------------------------------------------
 Student 1: What is your name?
 
-
+Joshua Song
 
 ------------------------------------------------------------------------
 Student 2: What is your name?
 
-
+Sergei Kudriavtcev
 
 ------------------------------------------------------------------------
 Student 1: What authorized sources of information did you use to
@@ -107,6 +107,66 @@ particular, what bugs are in your submission?
 What is your mywc program test plan?
 
 
+Boundary tests:
+
+mywcempty.txt: Empty file. Tests the boundary where the while loop
+condition on line 30 is immediately false, so only lines 30, 52, 55,
+56 execute.
+
+mywcspaces.txt: Contains only spaces. Tests the boundary where every
+character is whitespace but iInWord is never set TRUE, so lines 36
+and 44 are both false. Executes lines 30, 32, 34, 36, 48, 52, 55, 56.
+
+mywcnewlines.txt: Contains only newlines. Tests the boundary where
+every character is whitespace and a newline. Executes lines 30, 32,
+34, 36, 48, 49, 52, 55, 56.
+
+mywcsinglechar.txt: Contains a single non-whitespace character with
+no newline. Tests the boundary of a one-character file ending
+mid-word. Executes lines 30, 32, 34, 44, 45, 48, 52, 53, 55, 56.
+
+mywccharsonly.txt: Contains only non-whitespace characters with no
+spaces or newlines. Tests boundary where isspace is never true and
+iInWord is set once and never reset. Executes lines 30, 32, 34, 44,
+45, 48, 52, 53, 55, 56.
+
+mywcnonewline.txt: Contains words separated by a space but no
+trailing newline. Tests the boundary where EOF is reached while
+iInWord is TRUE. Executes lines 30, 32, 34, 36, 38, 39, 44, 45, 48,
+52, 53, 55, 56.
+
+Statement tests:
+
+mywcmultiword.txt: Contains multiple words per line separated by
+spaces, ending with newlines. Causes the computer to execute lines
+30, 32, 34, 36, 38, 39, 44, 45, 48, 49, 52, 55, 56.
+
+mywctabs.txt: Contains words separated by tab characters with
+newlines. Tabs are whitespace per isspace(), exercising the same
+paths as spaces. Causes the computer to execute lines 30, 32, 34,
+36, 38, 39, 44, 45, 48, 49, 52, 55, 56.
+
+mywcwordspace.txt: Contains words followed by spaces on one line.
+Specifically exercises line 36 (iInWord TRUE mid-loop) and lines 38,
+39. Causes the computer to execute lines 30, 32, 34, 36, 38, 39, 44,
+45, 48, 52, 55, 56.
+
+mywcmix.txt: Contains a mix of spaces, tabs, newlines, and words.
+Exercises all branches collectively. Causes the computer to execute
+lines 30, 32, 34, 36, 38, 39, 44, 45, 48, 49, 52, 55, 56.
+
+Stress tests:
+
+mywclargewords.txt: Contains 1000 lines each with one word. Stress
+tests line and word counting with a large number of lines.
+
+mywclargestandard.txt: Contains 500 lines each with 10 random words.
+Stress tests general word and line counting with a large realistic
+input.
+
+mywclargestress.txt: Contains a single long line of nearly 50000
+characters with no trailing newline. Stress tests character counting
+and the EOF mid-word path with maximum input size.
 
 ------------------------------------------------------------------------
 What are the CPU times consumed by the programs from Parts 2a, 2b, 2d,
