@@ -1,6 +1,6 @@
 /*--------------------------------------------------------------------*/
 /* mywc.s                                                             */
-/* Author: Joshua (Kimyung) Song, Sergei Kudriatcev                   */                      */
+/* Author: Joshua (Kimyung) Song, Sergei Kudriavtcev                   */                      */
 /*--------------------------------------------------------------------*/
 
         .section .rodata
