@@ -31,6 +31,12 @@ iInWord:
         .equ MAIN_STACK_BYTECOUNT, 16
         .global main
 
+/*--------------------------------------------------------------------*/
+
+/* Write to stdout counts of how many lines, words, and characters
+   are in stdin. A word is a sequence of non-whitespace characters.
+   Whitespace is defined by the isspace() function. Return 0. */
+
 main:
         // Prolog
         sub     sp, sp, MAIN_STACK_BYTECOUNT
