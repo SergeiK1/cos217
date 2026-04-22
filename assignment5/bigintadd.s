@@ -109,7 +109,7 @@ BigInt_add:
     // x1 = 0
     mov     x1, 0
 
-    // x2 = MAXX_DIGITS * sizeof(unsigned long) = 32768 * 8
+    // x2 = MAX_DIGITS * sizeof(unsigned long) = 32768 * 8
     mov     x2, MAX_DIGITS
     lsl     x2, x2, 3 // *8 
     
