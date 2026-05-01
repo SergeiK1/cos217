@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------*/
-/* createdataB.c                                                      */
+/* createdataAplus.c                                                  */
 /* Author: Joshua (Kimyung) Song, Sergei Kudriavtcev                  */
 /*--------------------------------------------------------------------*/
 
@@ -31,43 +31,39 @@ int main(void) {
     fprintf(psFile, "Josh Song"); /* prints name bytes */
     putc('\0', psFile);
 
-    /* padding after name "Josh Song" */
-    for (i = 10; i < 20; i++)
-      putc(0x41, psFile);
+    /* A+ string */
+    fprintf(psFile, "A+ is your grade.");
+    putc('\0', psFile);
 
-    /* instruction 1 at name[20], #65 in ASCII is 'A'*/
-    uiInstr = MiniAssembler_mov(1, 65); /* mov w1, #65 */
-    fwrite(&uiInstr, sizeof(unsigned int), 1, psFile);
+    /* padding after "Josh Song" and "A+ is your grade." */
+    for (i = 30; i < 32; i++) {
+        putc(0x41, psFile);
+    }
 
-    /* instruction 2 at name[24], 0x420044 is the address of grade */
-    /* adr x0, grade */
-    uiInstr = MiniAssembler_adr(0, 0x420044, 0x420070);
-    fwrite(&uiInstr, sizeof(unsigned int), 1, psFile);
-
-    /* instruction 3 at name[28], 'A' in to grade*/
     uiInstr = MiniAssembler_strb(1, 0); /* strb w1, [x0] */
+
+    /* instruction 1 at name[32] */
+    /* adr x0, 0x420062 where name[10] has A+ string */
+    uiInstr = MiniAssembler_adr(0, 0x420062, 0x420078);
     fwrite(&uiInstr, sizeof(unsigned int), 1, psFile);
 
-    /* Writes instruction 4 at name[32] */
-    uiInstr = MiniAssembler_mov(1, 43); /* mov w1, #43 */
+    /* instruction 2 at name[36] */
+    /* mov w1, #10 with newline character*/
+    uiInstr = MiniAssembler_mov(1, 10);
     fwrite(&uiInstr, sizeof(unsigned int), 1, psFile);
 
-    /* Writes instruction 5 at name[36] */
-    /* adr x0, grade[1]*/
-    uiInstr = MiniAssembler_adr(0, 0x420045, 0x42007c); 
+    /* instruction 3 at name[40] */
+    /* b 0x4008ac, branching back to main after print */
+    uiInstr = MiniAssembler_b(0x4008ac, 0x420080);
     fwrite(&uiInstr, sizeof(unsigned int), 1, psFile);
 
-    /* Writes instruction 6 at name[40] */
-    uiInstr = MiniAssembler_strb(1, 0); /* strb w1, [x0]*/
-    fwrite(&uiInstr, sizeof(unsigned int), 1, psFile);
-
-    /* Writes instruction 7 at name[44] */
-    /* b 0x40089c */
-    uiInstr = MiniAssembler_b(0x40089c, 0x420084);
-    fwrite(&uiInstr, sizeof(unsigned int), 1, psFile);
-
-    /* write address of name[0] in x30 */
-    ulAddr = 0x42006c;
+    /* padding */
+    for (i = 44; i < 48; i++) {
+        putc('A', psFile);
+    }
+    
+    /* write address of name[32] in x30 */
+    ulAddr = 0x420078;
     fwrite(&ulAddr, sizeof(unsigned long), 1, psFile);
 
     fclose(psFile);
