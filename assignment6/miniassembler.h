@@ -55,6 +55,12 @@ unsigned int MiniAssembler_strb(unsigned int uiFromReg,
 unsigned int MiniAssembler_b(unsigned long ulAddr,
    unsigned long ulAddrOfThisInstr);
 
+/*--------------------------------------------------------------------*/
 
+/* Return the machine language encoding of the bl instruction that
+   branches to ulAddr from ulAddrOfThisInstr and stores the return
+   address in x30. */
+unsigned int MiniAssembler_bl(unsigned long ulAddr,
+   unsigned long ulAddrOfThisInstr);
 
 #endif
