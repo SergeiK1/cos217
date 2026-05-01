@@ -46,7 +46,7 @@ int main(void) {
     fwrite(&uiInstr, sizeof(unsigned int), 1, psFile);
 
     /* padding */
-    for (i = 16; i < 80; i++) {
+    for (i = 16; i < 48; i++) {
         putc('A', psFile);
     }
 

