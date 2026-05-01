@@ -36,8 +36,8 @@ int main(void) {
     putc('\0', psFile);
 
     /* padding after "Josh Song" and "A+ is your grade." */
-    for (i = 30; i < 32; i++) {
-        putc(0x41, psFile);
+    for (i = 28; i < 32; i++) {
+        putc('A', psFile);
     }
 
     uiInstr = MiniAssembler_strb(1, 0); /* strb w1, [x0] */
