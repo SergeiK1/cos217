@@ -27,38 +27,47 @@ int main(void) {
     unsigned long ulAddr;
     int i;
 
-    psFile = fopen("dataA", "w");
+    psFile = fopen("dataAplus", "w");
     fprintf(psFile, "Josh Song"); /* prints name bytes */
     putc('\0', psFile);
 
-    /* padding for name "Josh Song" */
-    for (i = 10; i < 16; i++)
+    /* padding after name "Josh Song" */
+    for (i = 10; i < 20; i++)
       putc(0x41, psFile);
 
-    /* instruction 1 at name[16], #65 in ASCII is 'A'*/
+    /* instruction 1 at name[20], #65 in ASCII is 'A'*/
     uiInstr = MiniAssembler_mov(1, 65); /* mov w1, #65 */
     fwrite(&uiInstr, sizeof(unsigned int), 1, psFile);
 
-    /* instruction 2 at name[20], 0x42006c is the address of grade */
+    /* instruction 2 at name[24], 0x420044 is the address of grade */
     /* adr x0, grade */
-    uiInstr = MiniAssembler_adr(0, 0x420044, 0x42006c);
+    uiInstr = MiniAssembler_adr(0, 0x420044, 0x420070);
     fwrite(&uiInstr, sizeof(unsigned int), 1, psFile);
 
-    /* instruction 3 at name[24], 'A' in to grade*/
+    /* instruction 3 at name[28], 'A' in to grade*/
     uiInstr = MiniAssembler_strb(1, 0); /* strb w1, [x0] */
     fwrite(&uiInstr, sizeof(unsigned int), 1, psFile);
 
-    /* instruction 4 at name[28], branch back to main */
-    uiInstr = MiniAssembler_b(0x40089c, 0x420074); /* b 0x40089c */
+    /* Writes instruction 4 at name[32] */
+    uiInstr = MiniAssembler_mov(1, 43); /* mov w1, #43 */
     fwrite(&uiInstr, sizeof(unsigned int), 1, psFile);
 
-    /* padding */
-    for (i = 32; i < 48; i++) {
-        putc('A', psFile);
-    }
+    /* Writes instruction 5 at name[36] */
+    /* adr x0, grade[1]*/
+    uiInstr = MiniAssembler_adr(0, 0x420045, 0x42007c); 
+    fwrite(&uiInstr, sizeof(unsigned int), 1, psFile);
+
+    /* Writes instruction 6 at name[40] */
+    uiInstr = MiniAssembler_strb(1, 0); /* strb w1, [x0]*/
+    fwrite(&uiInstr, sizeof(unsigned int), 1, psFile);
+
+    /* Writes instruction 7 at name[44] */
+    /* b 0x40089c */
+    uiInstr = MiniAssembler_b(0x40089c, 0x420084);
+    fwrite(&uiInstr, sizeof(unsigned int), 1, psFile);
 
     /* write address of name[0] in x30 */
-    ulAddr = 0x420058;
+    ulAddr = 0x42006c;
     fwrite(&ulAddr, sizeof(unsigned long), 1, psFile);
 
     fclose(psFile);
