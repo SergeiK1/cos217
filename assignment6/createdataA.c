@@ -26,7 +26,7 @@ int main(void) {
     unsigned long ulAddr;
     int i;
 
-    psFile = fopen("dataA", "wa");
+    psFile = fopen("dataA", "w");
 
     /* instruction 1 at name[0], #65 in ASCII is 'A'*/
     uiInstr = MiniAssembler_mov(1, 65); /* mov w1, #65 */
@@ -46,7 +46,7 @@ int main(void) {
     fwrite(&uiInstr, sizeof(unsigned int), 1, psFile);
 
     /* padding */
-    for (i = 16; i < 48; i++) {
+    for (i = 16; i < 80; i++) {
         putc('A', psFile);
     }
 

