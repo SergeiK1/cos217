@@ -4,12 +4,13 @@
 /*--------------------------------------------------------------------*/
 
 /* File comment:
-Produces a file called dataA that earns an A by placing executable
-instructions into the nae array, padding the stack to reach getName's
-x30, and overwiritng it with the address of name[0]. When getName
-returns, jumps to the injected instructions, which write 'A' into grade
-and brnach back to main.
-*/
+ Produces a file called dataAplus that earns an A+. The file first
+ writes the readable name and a null byte into the name array, then
+ writes instructions later in the same array. It pads to getName's
+ saved x30 and overwrites x30 with the address of those instructions.
+ When getName returns, the injected instructions write 'A' and '+' into
+ grade, then branch back to main.
+ */
 
 #include <stdio.h>
 #include "miniassembler.h"
@@ -17,7 +18,7 @@ and brnach back to main.
 /* Function comment:
 main takes no command-line arguments and does not read from stdin or
 any other input stream. It writes binary data directly into a file
-named "dataA", and produces no output to stdout or stderr. The
+named "dataAplus", and produces no output to stdout or stderr. The
 function returns 0 on success.
 */
 int main(void) {

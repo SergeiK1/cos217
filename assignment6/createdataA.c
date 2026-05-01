@@ -30,29 +30,29 @@ int main(void) {
     fprintf(psFile, "Josh Song"); /* prints name bytes */
     putc('\0', psFile);
 
-    /* padding for name "Josh Song" */
-    for (i = 10; i < 16; i++)
+    /* padding after name "Josh Song" */
+    for (i = 10; i < 20; i++)
       putc(0x41, psFile);
 
-    /* instruction 1 at name[16], #65 in ASCII is 'A'*/
+    /* instruction 1 at name[20], #65 in ASCII is 'A'*/
     uiInstr = MiniAssembler_mov(1, 65); /* mov w1, #65 */
     fwrite(&uiInstr, sizeof(unsigned int), 1, psFile);
 
-    /* instruction 2 at name[20], 0x42006c is the address of grade */
+    /* instruction 2 at name[24], 0x420044 is the address of grade */
     /* adr x0, grade */
-    uiInstr = MiniAssembler_adr(0, 0x420044, 0x42006c);
+    uiInstr = MiniAssembler_adr(0, 0x420044, 0x420070);
     fwrite(&uiInstr, sizeof(unsigned int), 1, psFile);
 
-    /* instruction 3 at name[24], 'A' in to grade*/
+    /* instruction 3 at name[28], 'A' in to grade*/
     uiInstr = MiniAssembler_strb(1, 0); /* strb w1, [x0] */
     fwrite(&uiInstr, sizeof(unsigned int), 1, psFile);
 
-    /* instruction 4 at name[28], branch back to main */
-    uiInstr = MiniAssembler_b(0x40089c, 0x420074); /* b 0x40089c */
+    /* instruction 4 at name[32], branch back to main */
+    uiInstr = MiniAssembler_b(0x40089c, 0x420078); /* b 0x40089c */
     fwrite(&uiInstr, sizeof(unsigned int), 1, psFile);
 
     /* padding */
-    for (i = 32; i < 48; i++) {
+    for (i = 36; i < 48; i++) {
         putc('A', psFile);
     }
 
